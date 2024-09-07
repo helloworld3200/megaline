@@ -2,6 +2,17 @@
 
 const import_prefix = "";
 
+const shaderProgramInfo = {
+    program: shaderProgram,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgram, "uProjectionMatrix"),
+      modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
+    },
+};
+
 async function fetchOptions() {
     const options_file = await fetch(import_prefix + "static/options.json")
     const options = await options_file.json();
