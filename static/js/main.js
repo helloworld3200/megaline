@@ -6,7 +6,7 @@ const import_prefix = "";
 const fov = 75;
 const heightMultiplier = 2.0;
 const fps = 60;
-const debugTest = false;
+const debugTest = true;
 
 // dont change
 const fullscreenQuad = new Float32Array([
@@ -19,7 +19,11 @@ const fullscreenQuad = new Float32Array([
 ]);
 
 const webgl2 = "webgl2";
-const canvasID = "megaline-canvas";
+const canvasID = "megaline-main-canvas";
+const debugBoxID = "megaline-debug-box";
+
+const fragShaderPath = import_prefix + "static/shaders/megaline-frag.glsl";
+const vertShaderPath = import_prefix + "static/shaders/megaline-vert.glsl";
 
 const fovRadians = (fov * Math.PI) / 180;
 const fpsInterval = 1000 / fps;
@@ -32,8 +36,8 @@ async function setup() {
 }
 
 async function fetchShaders() {
-    const frag_shader_file = await fetch(import_prefix + "static/shaders/megaline-frag.glsl");
-    const vert_shader_file = await fetch(import_prefix + "static/shaders/megaline-vert.glsl");
+    const frag_shader_file = await fetch(fragShaderPath);
+    const vert_shader_file = await fetch(vertShaderPath);
 
     const frag_shader = await frag_shader_file.text();
     const vert_shader = await vert_shader_file.text();
@@ -113,6 +117,13 @@ function drawScene (gl, shaderProgramInfo, canvas, time) {
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
+function setupDebugBox () {
+    const debugBox = document.getElementById(debugBoxID);
+    if (!debugTest) {
+        debugBox.style.display = "none";
+    }
+}
+
 function renderMainloop (gl, shaderProgramInfo, canvas) {
     let then = 0;
 
@@ -136,6 +147,8 @@ function renderMainloop (gl, shaderProgramInfo, canvas) {
 function init (shaders) {
     const canvas = document.getElementById(canvasID);
     const gl = canvas.getContext(webgl2);
+    
+    setupDebugBox();
 
     if (!glCompatCheck(gl)) return;
 

@@ -5,6 +5,13 @@
   overflow-x: hidden;
 }
 
-.megaline-main-canvas {
-  
+.megaline-debug-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.megaline-debug-fps {
+  font-size: 2.5em;
 }
