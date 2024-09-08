@@ -1,5 +1,6 @@
 /* No margins on body so that the webgl canvas has no edges */
 body {
   margin: 0;
-  overflow: hidden;
+  margin-bottom: 0;
+  overflow-x: hidden;
 }

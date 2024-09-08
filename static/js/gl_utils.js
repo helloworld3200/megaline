@@ -1,3 +1,4 @@
+'use strict';
 // Utility functions with WebGL
 
 function glCompatCheck (gl) {
@@ -38,4 +39,9 @@ function glShaderProgram (gl, vertSrc, fragSrc) {
     }
 
     return shader_program;
+}
+
+function glLogVersions(gl) {
+    console.log('WebGL Version:', gl.getParameter(gl.VERSION));
+    console.log('GLSL Version:', gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
 }
