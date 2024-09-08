@@ -5,6 +5,7 @@
 const import_prefix = "";
 const fov = 75;
 const heightMultiplier = 2.0;
+const fps = 60;
 
 // dont change
 const fullscreenQuad = new Float32Array([
@@ -17,6 +18,7 @@ const fullscreenQuad = new Float32Array([
 ]);
 
 const fovRadians = (fov * Math.PI) / 180;
+const fpsInterval = 1000 / fps;
 
 async function setup() {
     const options = await fetchOptions();
@@ -72,16 +74,21 @@ function clearCanvas (gl) {
     gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
-function getShaderProgramInfo (gl, shaderProgram) {
-    return {
+function setupShaderProgramInfo (gl, shaders) {
+    const shaderProgram = glShaderProgram(gl, shaders.vert, shaders.frag);
+
+    const shaderProgramInfo = {
         program: shaderProgram,
         attribLocations: {
           vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
         },
         uniformLocations: {
             resolution: gl.getUniformLocation(shaderProgram, "uResolution"),
+            time: gl.getUniformLocation(shaderProgram, "uTime"),
         },
     };
+
+    return shaderProgramInfo;
 }
 
 function setupBuffers (gl, shaderProgramInfo) {
@@ -95,8 +102,37 @@ function setupVertexArray (gl, shaderProgramInfo, buffers) {
     gl.vertexAttribPointer(shaderProgramInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
 }
 
-function setupUniforms (gl, shaderProgramInfo, canvas) {
+function setupUniforms (gl, shaderProgramInfo, canvas, time) {
     gl.uniform2f(shaderProgramInfo.uniformLocations.resolution, canvas.width, canvas.height);
+    gl.uniform2f(shaderProgramInfo.uniformLocations.time, time[0], time[1]);
+}
+
+function drawScene (gl, shaderProgramInfo, canvas, time) {
+    setupUniforms(gl, shaderProgramInfo, canvas, time);
+    clearCanvas(gl);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+
+function renderMainloop (gl, shaderProgramInfo, canvas) {
+    let then = 0;
+    let totalTime = 0;
+
+    function render (now) {
+        now *= 0.00001;
+
+        totalTime += now;
+
+        const deltaTime = now - then;
+        then = now;
+
+        const time = [totalTime, deltaTime];
+
+        drawScene(gl, shaderProgramInfo, canvas, time);
+
+        setTimeout(() => {requestAnimationFrame(render); console.log(totalTime)}, fpsInterval);
+    }
+
+    requestAnimationFrame(render);
 }
 
 function init (options, shaders) {
@@ -109,19 +145,13 @@ function init (options, shaders) {
 
     setDimensions(canvas, gl);
 
-    const shaderProgram = glShaderProgram(gl, shaders.vert, shaders.frag);
-
-    const shaderProgramInfo = getShaderProgramInfo(gl, shaderProgram);
+    const shaderProgramInfo = setupShaderProgramInfo(gl, shaders);
 
     setupBuffers(gl, shaderProgramInfo);
 
     gl.useProgram(shaderProgramInfo.program);
 
-    setupUniforms(gl, shaderProgramInfo, canvas);
-
-    clearCanvas(gl);
-
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    renderMainloop(gl, shaderProgramInfo, canvas);
 }
 
 setup();
