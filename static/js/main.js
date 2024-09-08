@@ -6,6 +6,7 @@ const import_prefix = "";
 const fov = 75;
 const heightMultiplier = 2.0;
 const fps = 60;
+const debugTest = false;
 
 // dont change
 const fullscreenQuad = new Float32Array([
@@ -17,21 +18,17 @@ const fullscreenQuad = new Float32Array([
      1.0,  1.0  // Top-right
 ]);
 
+const webgl2 = "webgl2";
+const canvasID = "megaline-canvas";
+
 const fovRadians = (fov * Math.PI) / 180;
 const fpsInterval = 1000 / fps;
 
 async function setup() {
-    const options = await fetchOptions();
+    console.log("Starting setup");
     const shaders = await fetchShaders();
 
-    init(options, shaders);
-}
-
-async function fetchOptions() {
-    const options_file = await fetch(import_prefix + "static/options.json")
-    const options = await options_file.json();
-
-    return options;
+    init(shaders);
 }
 
 async function fetchShaders() {
@@ -88,12 +85,15 @@ function setupShaderProgramInfo (gl, shaders) {
         },
     };
 
+    console.log("Shader program setup complete");
+
     return shaderProgramInfo;
 }
 
 function setupBuffers (gl, shaderProgramInfo) {
     const buffers = initBuffers(gl);
     setupVertexArray(gl, shaderProgramInfo, buffers);
+    console.log("Buffers setup complete");
 }
 
 function setupVertexArray (gl, shaderProgramInfo, buffers) {
@@ -115,35 +115,34 @@ function drawScene (gl, shaderProgramInfo, canvas, time) {
 
 function renderMainloop (gl, shaderProgramInfo, canvas) {
     let then = 0;
-    let totalTime = 0;
 
     function render (now) {
-        now *= 0.00001;
-
-        totalTime += now;
+        now *= 0.0001;
 
         const deltaTime = now - then;
         then = now;
 
-        const time = [totalTime, deltaTime];
+        const time = [now, deltaTime];
 
         drawScene(gl, shaderProgramInfo, canvas, time);
 
-        setTimeout(() => {requestAnimationFrame(render); console.log(totalTime)}, fpsInterval);
+        setTimeout(() => {requestAnimationFrame(render)}, fpsInterval);
     }
 
+    console.log("Rendering mainloop started");
     requestAnimationFrame(render);
 }
 
-function init (options, shaders) {
-    const canvas = document.getElementById("canvas");
-    const gl = canvas.getContext("webgl2");
+function init (shaders) {
+    const canvas = document.getElementById(canvasID);
+    const gl = canvas.getContext(webgl2);
 
     if (!glCompatCheck(gl)) return;
 
     glLogVersions(gl);
 
     setDimensions(canvas, gl);
+    window.addEventListener("resize", () => setDimensions(canvas, gl));
 
     const shaderProgramInfo = setupShaderProgramInfo(gl, shaders);
 

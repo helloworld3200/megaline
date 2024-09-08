@@ -1,6 +1,10 @@
 /* No margins on body so that the webgl canvas has no edges */
-body {
+.fullscreen-fit {
   margin: 0;
   margin-bottom: 0;
   overflow-x: hidden;
+}
+
+.megaline-main-canvas {
+  
 }
