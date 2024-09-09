@@ -6,7 +6,9 @@ const import_prefix = "";
 const fov = 75;
 const heightMultiplier = 2.0;
 const fps = 60;
+
 const debugTest = true;
+const debugFPS = 5;
 
 // dont change
 const fullscreenQuad = new Float32Array([
@@ -20,7 +22,11 @@ const fullscreenQuad = new Float32Array([
 
 const webgl2 = "webgl2";
 const canvasID = "megaline-main-canvas";
+
 const debugBoxID = "megaline-debug-box";
+const debugFPSID = "megaline-debug-fps";
+
+const debugFPSInterval = 1000 / debugFPS;
 
 const fragShaderPath = import_prefix + "static/shaders/megaline-frag.glsl";
 const vertShaderPath = import_prefix + "static/shaders/megaline-vert.glsl";
@@ -122,33 +128,51 @@ function setupDebugBox () {
     if (!debugTest) {
         debugBox.style.display = "none";
     }
+    
+    return debugBox;
 }
 
-function renderMainloop (gl, shaderProgramInfo, canvas) {
+function setupDebugElements () {
+    const debugElements = {
+        debugBox: setupDebugBox(),
+        fps: document.getElementById(debugFPSID),
+    };
+
+    return debugElements;
+}
+
+function renderMainloop (gl, shaderProgramInfo, canvas, debugElements) {
+    let currentFPS = 0;
+
     let then = 0;
 
     function render (now) {
-        now *= 0.0001;
+        now *= 0.001;
 
         const deltaTime = now - then;
         then = now;
 
         const time = [now, deltaTime];
 
-        drawScene(gl, shaderProgramInfo, canvas, time);
+        currentFPS = 1 / deltaTime;
 
-        setTimeout(() => {requestAnimationFrame(render)}, fpsInterval);
+        drawScene(gl, shaderProgramInfo, canvas, time);
+    }
+
+    function debugRender () {
+        debugElements.fps.innerHTML = Math.round(currentFPS);
     }
 
     console.log("Rendering mainloop started");
-    requestAnimationFrame(render);
+    const debugRenderInterval = setInterval(debugRender, debugFPSInterval);
+    const mainRenderInterval = setInterval(() => {requestAnimationFrame(render)}, fpsInterval);
 }
 
 function init (shaders) {
     const canvas = document.getElementById(canvasID);
     const gl = canvas.getContext(webgl2);
     
-    setupDebugBox();
+    const debugElements = setupDebugElements();
 
     if (!glCompatCheck(gl)) return;
 
@@ -163,7 +187,7 @@ function init (shaders) {
 
     gl.useProgram(shaderProgramInfo.program);
 
-    renderMainloop(gl, shaderProgramInfo, canvas);
+    renderMainloop(gl, shaderProgramInfo, canvas, debugElements);
 }
 
 setup();
