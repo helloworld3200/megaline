@@ -10,6 +10,9 @@ const fps = 60;
 const debugTest = true;
 const debugFPS = 5;
 
+//
+const shaderBGColor = []
+
 // dont change
 const fullscreenQuad = new Float32Array([
     -1.0, -1.0, // Bottom-left

@@ -2,6 +2,7 @@
 .fullscreen-fit {
   margin: 0;
   margin-bottom: 0;
+  background-color: #181818;
   overflow-x: hidden;
 }
 
