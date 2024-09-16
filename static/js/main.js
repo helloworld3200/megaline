@@ -10,7 +10,7 @@ const fps = 60;
 const debugTest = true;
 const debugFPS = 5;
 
-//
+// shader background color (sRGB)
 const shaderBGColor = []
 
 // dont change
@@ -95,6 +95,7 @@ function setupShaderProgramInfo (gl, shaders) {
         uniformLocations: {
             resolution: gl.getUniformLocation(shaderProgram, "uResolution"),
             time: gl.getUniformLocation(shaderProgram, "uTime"),
+            bgColor: gl.getUniformLocation(shaderProgram, "uBGColor"),
         },
     };
 
@@ -106,7 +107,12 @@ function setupShaderProgramInfo (gl, shaders) {
 function setupBuffers (gl, shaderProgramInfo) {
     const buffers = initBuffers(gl);
     setupVertexArray(gl, shaderProgramInfo, buffers);
+    setupConstUniforms(gl, shaderProgramInfo);
     console.log("Buffers setup complete");
+}
+
+function setupConstUniforms (gl, shaderProgramInfo) {
+    gl.uniform3f(shaderProgramInfo.uniformLocations.bgColor, shaderBGColor[0], shaderBGColor[1], shaderBGColor[2]);
 }
 
 function setupVertexArray (gl, shaderProgramInfo, buffers) {
@@ -169,6 +175,10 @@ function renderMainloop (gl, shaderProgramInfo, canvas, debugElements) {
     console.log("Rendering mainloop started");
     const debugRenderInterval = setInterval(debugRender, debugFPSInterval);
     const mainRenderInterval = setInterval(() => {requestAnimationFrame(render)}, fpsInterval);
+}
+
+function sRGBToLinear (sRGB) {
+    return 
 }
 
 function init (shaders) {
