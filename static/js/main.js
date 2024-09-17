@@ -11,7 +11,7 @@ const debugTest = true;
 const debugFPS = 5;
 
 // shader background color (sRGB)
-const shaderBGColor = []
+const shaderBGColor = [24, 24, 24];
 
 // dont change
 const fullscreenQuad = new Float32Array([
@@ -36,6 +36,8 @@ const vertShaderPath = import_prefix + "static/shaders/megaline-vert.glsl";
 
 const fovRadians = (fov * Math.PI) / 180;
 const fpsInterval = 1000 / fps;
+
+const shaderBGColorLinear = sRGBToLinear(shaderBGColor);
 
 async function setup() {
     console.log("Starting setup");
@@ -112,7 +114,7 @@ function setupBuffers (gl, shaderProgramInfo) {
 }
 
 function setupConstUniforms (gl, shaderProgramInfo) {
-    gl.uniform3f(shaderProgramInfo.uniformLocations.bgColor, shaderBGColor[0], shaderBGColor[1], shaderBGColor[2]);
+    gl.uniform3f(shaderProgramInfo.uniformLocations.bgColor, shaderBGColorLinear[0], shaderBGColorLinear[1], shaderBGColorLinear[2]);
 }
 
 function setupVertexArray (gl, shaderProgramInfo, buffers) {
@@ -177,10 +179,6 @@ function renderMainloop (gl, shaderProgramInfo, canvas, debugElements) {
     const mainRenderInterval = setInterval(() => {requestAnimationFrame(render)}, fpsInterval);
 }
 
-function sRGBToLinear (sRGB) {
-    return 
-}
-
 function init (shaders) {
     const canvas = document.getElementById(canvasID);
     const gl = canvas.getContext(webgl2);
@@ -196,9 +194,9 @@ function init (shaders) {
 
     const shaderProgramInfo = setupShaderProgramInfo(gl, shaders);
 
-    setupBuffers(gl, shaderProgramInfo);
-
     gl.useProgram(shaderProgramInfo.program);
+
+    setupBuffers(gl, shaderProgramInfo);
 
     renderMainloop(gl, shaderProgramInfo, canvas, debugElements);
 }
