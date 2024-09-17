@@ -10,8 +10,8 @@ const fps = 60;
 const debugTest = true;
 const debugFPS = 5;
 
-// shader background color (sRGB)
-const shaderBGColor = [24, 24, 24];
+// shader background color (linear color space)
+const shaderBGColor = [0.09412, 0.09412, 0.09412];
 
 // dont change
 const fullscreenQuad = new Float32Array([
@@ -36,8 +36,6 @@ const vertShaderPath = import_prefix + "static/shaders/megaline-vert.glsl";
 
 const fovRadians = (fov * Math.PI) / 180;
 const fpsInterval = 1000 / fps;
-
-const shaderBGColorLinear = sRGBToLinear(shaderBGColor);
 
 async function setup() {
     console.log("Starting setup");
@@ -114,7 +112,7 @@ function setupBuffers (gl, shaderProgramInfo) {
 }
 
 function setupConstUniforms (gl, shaderProgramInfo) {
-    gl.uniform3f(shaderProgramInfo.uniformLocations.bgColor, shaderBGColorLinear[0], shaderBGColorLinear[1], shaderBGColorLinear[2]);
+    gl.uniform3f(shaderProgramInfo.uniformLocations.bgColor, shaderBGColor[0], shaderBGColor[1], shaderBGColor[2]);
 }
 
 function setupVertexArray (gl, shaderProgramInfo, buffers) {
