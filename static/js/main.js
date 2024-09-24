@@ -2,7 +2,7 @@
 // welcome to megaline
 
 // variables u can change
-const import_prefix = "";
+const import_prefix = "static/megaline/";
 const fov = 75;
 const heightMultiplier = 2.0;
 const fps = 60;
