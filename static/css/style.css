@@ -2,6 +2,7 @@
 .fullscreen-fit {
   margin: 0;
   margin-bottom: 0;
+  background-color: #181818;
   overflow-x: hidden;
 }
 
@@ -14,4 +15,5 @@
 
 .megaline-debug-fps {
   font-size: 2.5em;
+  color: white;
 }

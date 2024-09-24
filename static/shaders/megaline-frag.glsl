@@ -5,6 +5,8 @@ precision mediump float;
 uniform vec2 uResolution;
 uniform vec2 uTime;
 
+uniform vec3 uBGColor;
+
 out vec4 FragColor;
 
 float normSin(float x) {
@@ -14,5 +16,6 @@ float normSin(float x) {
 void main() {
     vec2 ndc = gl_FragCoord.xy / uResolution;
 
-    FragColor = vec4(step(normSin(uTime.x), ndc.y), 0, 0.0, 1);
+    float aboveSine = sin(uTime.x);
+    FragColor = vec4(uBGColor, 1);
 }

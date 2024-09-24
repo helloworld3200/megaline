@@ -2,13 +2,16 @@
 // welcome to megaline
 
 // variables u can change
-const import_prefix = "";
+const import_prefix = "static/megaline/";
 const fov = 75;
 const heightMultiplier = 2.0;
 const fps = 60;
 
 const debugTest = true;
 const debugFPS = 5;
+
+// shader background color (linear color space)
+const shaderBGColor = [0.09412, 0.09412, 0.09412];
 
 // dont change
 const fullscreenQuad = new Float32Array([
@@ -92,6 +95,7 @@ function setupShaderProgramInfo (gl, shaders) {
         uniformLocations: {
             resolution: gl.getUniformLocation(shaderProgram, "uResolution"),
             time: gl.getUniformLocation(shaderProgram, "uTime"),
+            bgColor: gl.getUniformLocation(shaderProgram, "uBGColor"),
         },
     };
 
@@ -103,7 +107,12 @@ function setupShaderProgramInfo (gl, shaders) {
 function setupBuffers (gl, shaderProgramInfo) {
     const buffers = initBuffers(gl);
     setupVertexArray(gl, shaderProgramInfo, buffers);
+    setupConstUniforms(gl, shaderProgramInfo);
     console.log("Buffers setup complete");
+}
+
+function setupConstUniforms (gl, shaderProgramInfo) {
+    gl.uniform3f(shaderProgramInfo.uniformLocations.bgColor, shaderBGColor[0], shaderBGColor[1], shaderBGColor[2]);
 }
 
 function setupVertexArray (gl, shaderProgramInfo, buffers) {
@@ -183,9 +192,9 @@ function init (shaders) {
 
     const shaderProgramInfo = setupShaderProgramInfo(gl, shaders);
 
-    setupBuffers(gl, shaderProgramInfo);
-
     gl.useProgram(shaderProgramInfo.program);
+
+    setupBuffers(gl, shaderProgramInfo);
 
     renderMainloop(gl, shaderProgramInfo, canvas, debugElements);
 }
