@@ -2,10 +2,13 @@
 // welcome to megaline
 
 // variables u can change
-const import_prefix = "static/megaline/";
+let import_prefix = "";
 const fov = 75;
 const heightMultiplier = 2.0;
 const fps = 60;
+
+// Turn on for personal website (helloworld3200.github.io)
+const doProdCheck = true;
 
 const debugTest = true;
 const debugFPS = 5;
@@ -13,7 +16,7 @@ const debugFPS = 5;
 // shader background color (linear color space)
 const shaderBGColor = [0.09412, 0.09412, 0.09412];
 
-// dont change
+// dont change the following vars
 const fullscreenQuad = new Float32Array([
     -1.0, -1.0, // Bottom-left
      1.0, -1.0, // Bottom-right
@@ -26,25 +29,49 @@ const fullscreenQuad = new Float32Array([
 const webgl2 = "webgl2";
 const canvasID = "megaline-main-canvas";
 
+const prodCheckID = "megaline-prod-check";
+
 const debugBoxID = "megaline-debug-box";
 const debugFPSID = "megaline-debug-fps";
 
 const debugFPSInterval = 1000 / debugFPS;
 
-const fragShaderPath = import_prefix + "static/shaders/megaline-frag.glsl";
-const vertShaderPath = import_prefix + "static/shaders/megaline-vert.glsl";
+let fragShaderPath = "static/shaders/megaline-frag.glsl";
+let vertShaderPath = "static/shaders/megaline-vert.glsl";
 
 const fovRadians = (fov * Math.PI) / 180;
 const fpsInterval = 1000 / fps;
 
-async function setup() {
+function prepareProd () {
+    const prodDiv = document.getElementById(prodCheckID);
+    const prodDivExists = prodDiv !== null;
+
+    if (doProdCheck && prodDivExists) {
+        import_prefix = "megaline/";
+        console.log("In production mode");
+    } else {
+        console.log("In development mode");
+    }
+}
+
+async function setupShaderPaths () {
+    fragShaderPath = import_prefix + fragShaderPath;
+    vertShaderPath = import_prefix + vertShaderPath;
+}
+
+async function setup (event) {
     console.log("Starting setup");
+     
+    await prepareProd();
+
     const shaders = await fetchShaders();
 
     init(shaders);
 }
 
-async function fetchShaders() {
+async function fetchShaders () {
+    setupShaderPaths();
+
     const frag_shader_file = await fetch(fragShaderPath);
     const vert_shader_file = await fetch(vertShaderPath);
 
@@ -199,4 +226,8 @@ function init (shaders) {
     renderMainloop(gl, shaderProgramInfo, canvas, debugElements);
 }
 
-setup();
+function setupOnLoad() {
+    document.addEventListener("DOMContentLoaded", setup);
+}
+
+setupOnLoad();
